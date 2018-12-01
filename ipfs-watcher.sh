@@ -6,9 +6,10 @@
 # ipns for one or more hashes.
 #
 # Requires: Installed ipfs
+# Requires: Manual creation of and permissions on /var/log/ipfs.log and /var/log/ipfsdaemon.log
+#  if you plan to run this script under a non-root user account which is recommended.
 #
 # MIT License
-#
 # Copyright 2018 James Wilmoth
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
