@@ -6,6 +6,8 @@
 # ipns for one or more hashes.
 #
 # Requires: Installed ipfs
+# Requires: Manual creation of /var/log/ipfs.log /var/log/ipfsdaemon.log /var/log/ipfsname.log
+#  with read/write access if not running under root (which is not recommended)
 #
 # MIT License
 #
