@@ -6,10 +6,9 @@
 # ipns for one or more hashes.
 #
 # Requires: Installed ipfs
-# Requires: Manual creation of and permissions on /var/log/ipfs.log and /var/log/ipfsdaemon.log
-#  if you plan to run this script under a non-root user account which is recommended.
 #
 # MIT License
+#
 # Copyright 2018 James Wilmoth
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
@@ -70,28 +69,29 @@ function logAndPrintFail {
 }
 
 #Test that ipfs is available
-whereis ipfs
+IPFS_PATH="$(whereis ipfs | cut -d' ' -f2)"
 if [ "$?" -ne 0 ]; then
 	logAndPrint "ipfs does not appear to be installed. please install first. https://docs.ipfs.io/introduction/install/"
 	exit $?
 fi
 	
 #Check for presence of ipfs daemon and start it if not
-pgrep -xf "ipfs daemon"
+pgrep -xf "$IPFS_PATH daemon"
 if [ "$?" -ne 0 ]; then
 	#Log to file	
 	logAndPrint "ipfs daemon not running; starting"
 	#Start
-	nohup ipfs daemon &>/var/log/ipfsdaemon.log &
+	nohup $IPFS_PATH daemon &>/var/log/ipfsdaemon.log &
 	#Sleep a bit to make sure process is running before we move on
 	logAndPrint "Sleeping for 20 seconds to give ipfs daemon a chance to start"
 	sleep 20s
 	
 	#Check for presence of ipfs daemon and if not running now, log failure
-	pgrep -xf "ipfs daemon" &>/dev/null
+	pgrep -xf "$IPFS_PATH daemon" &>/dev/null
 	if [ "$?" -ne 0 ]; then
 		#Log to file	
-		logAndPrintFail "ipfs daemon not running; we tried to start it but failed. Aborting..."
+		logAndPrint "ipfs daemon not running; we tried to start it but failed. Aborting..."
+		exit $?
 	else
 		#Log to file	
 		logAndPrint "ipfs daemon is running"
@@ -110,12 +110,13 @@ if [ "$#" -eq 1 ]; then
 	if [ "$LENGTH" -eq 46 ]; then		
 		logAndPrint "Length of parameter is 46, so this is most likely a single hash"
 		logAndPrint "Attempting to publish $PARAMETER"
-		ipfs name publish $PARAMETER &>/dev/null &
+		$IPFS_PATH name publish $PARAMETER &>/var/log/ipfsname.log &
 		logAndPrint "Waiting on process $!"
 		echo $! &>/dev/null
 		wait "$!"
 		if [ "$?" -ne 0 ]; then
-			logAndPrintFail "Failure to publish $PARAMETER"
+			logAndPrint "Failure to publish $PARAMETER"
+			exit $?
 		else
 			logAndPrint "Successfully published $PARAMETER"
 		fi
@@ -126,12 +127,13 @@ if [ "$#" -eq 1 ]; then
 			LENGTH=${#HASH}
 			if [ "$LENGTH" -eq 46 ]; then
 				logAndPrint "Attempting to publish $HASH"
-				ipfs name publish $HASH &>/dev/null &
+				$IPFS_PATH name publish "$HASH" &>/var/log/ipfsname.log &
 				logAndPrint "Waiting on process $!"
 				echo $! &>/dev/null
 				wait "$!"
 				if [ "$?" -ne 0 ]; then
-					logAndPrintFail "Failure to publish $HASH"
+					logAndPrint "Failure to publish $HASH"
+					exit $?
 				else
 					logAndPrint "Successfully published $HASH"
 				fi
