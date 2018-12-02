@@ -90,8 +90,7 @@ if [ "$?" -ne 0 ]; then
 	pgrep -xf "$IPFS_PATH daemon" &>/dev/null
 	if [ "$?" -ne 0 ]; then
 		#Log to file	
-		logAndPrint "ipfs daemon not running; we tried to start it but failed. Aborting..."
-		exit $?
+		logAndPrintFail "ipfs daemon not running; we tried to start it but failed. Aborting..."
 	else
 		#Log to file	
 		logAndPrint "ipfs daemon is running"
@@ -115,8 +114,7 @@ if [ "$#" -eq 1 ]; then
 		echo $! &>/dev/null
 		wait "$!"
 		if [ "$?" -ne 0 ]; then
-			logAndPrint "Failure to publish $PARAMETER"
-			exit $?
+			logAndPrintFail "Failure to publish $PARAMETER"
 		else
 			logAndPrint "Successfully published $PARAMETER"
 		fi
@@ -133,7 +131,6 @@ if [ "$#" -eq 1 ]; then
 				wait "$!"
 				if [ "$?" -ne 0 ]; then
 					logAndPrint "Failure to publish $HASH"
-					exit $?
 				else
 					logAndPrint "Successfully published $HASH"
 				fi
