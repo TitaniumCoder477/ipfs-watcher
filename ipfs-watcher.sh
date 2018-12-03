@@ -66,7 +66,7 @@ function logAndPrint {
 
 #Function to make code tidier AND bail
 function logAndPrintFail {
-	logAndPrint $1
+	logAndPrint "$1"
 	exit 1
 }
 
